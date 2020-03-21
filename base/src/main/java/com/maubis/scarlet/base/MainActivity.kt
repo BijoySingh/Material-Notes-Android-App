@@ -173,7 +173,6 @@ class MainActivity : SecuredActivity(), INoteOptionSheetActivity {
 
   fun setListeners() {
     snackbar = MainSnackbar(bottomSnackbar) { loadData() }
-    deleteTrashIcon.setOnClickListener { openDeleteTrashSheet(this@MainActivity) }
     searchBackButton.setOnClickListener {
       onBackPressed()
     }
@@ -263,7 +262,8 @@ class MainActivity : SecuredActivity(), INoteOptionSheetActivity {
 
   private fun notifyModeChange() {
     val isTrash = state.mode === HomeNavigationMode.TRASH
-    deleteToolbar.visibility = if (isTrash) View.VISIBLE else GONE
+    trashNoticeToolbar.visibility = if (isTrash) View.VISIBLE else GONE
+    setBottomToolbar()
   }
 
   fun onFolderChange(folder: Folder?) {
@@ -277,6 +277,7 @@ class MainActivity : SecuredActivity(), INoteOptionSheetActivity {
   private fun notifyFolderChange() {
     val componentContext = ComponentContext(this)
     lithoPreBottomToolbar.removeAllViews()
+    setBottomToolbar()
 
     val currentFolder = state.currentFolder
     if (currentFolder != null) {
@@ -532,7 +533,6 @@ class MainActivity : SecuredActivity(), INoteOptionSheetActivity {
     containerLayoutMain.setBackgroundColor(getThemeColor())
 
     val toolbarIconColor = sAppTheme.get(ThemeColorType.TOOLBAR_ICON)
-    deleteTrashIcon.setColorFilter(toolbarIconColor)
     deletesAutomatically.setTextColor(toolbarIconColor)
 
     setBottomToolbar()
@@ -553,6 +553,8 @@ class MainActivity : SecuredActivity(), INoteOptionSheetActivity {
         componentContext,
         MainActivityBottomBar.create(componentContext)
           .colorConfig(ToolbarColorConfig())
+          .disableNewFolderButton(state.currentFolder != null)
+          .isInTrash(state.mode == HomeNavigationMode.TRASH)
           .build()))
   }
 
